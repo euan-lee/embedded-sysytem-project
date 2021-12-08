@@ -30,6 +30,7 @@ int main(int argc , char **argv)
 	memset(&stlcd,0,sizeof(stTextLCD));
 	
 	if (argc < 3 )
+		
 	{
 		perror(" Args number is less than 2\n");
 		doHelp();
