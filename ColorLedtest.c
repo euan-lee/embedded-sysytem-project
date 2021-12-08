@@ -17,4 +17,5 @@ pwmSetPercent(atoi(argv[2]),1);
 pwmSetPercent(atoi(argv[3]),2);
 pwmInactiveAll();
 return 0;
+
 }
