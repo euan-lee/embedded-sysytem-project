@@ -27,4 +27,5 @@ int lcdtextwrite(const char str1, const char *str2, int lineFlag)
 	write(fd,&stlcd,sizeof(stTextLCD));
 	
 	close(fd);
+	
 }
