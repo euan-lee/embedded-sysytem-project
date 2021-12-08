@@ -31,6 +31,7 @@
 #define  CMD_TEST_GPIO_LOW			0x31
 
 typedef struct TextLCD_tag 
+	
 {
 	unsigned char cmd; //
 	unsigned char cmdData;  
