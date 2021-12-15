@@ -5,6 +5,8 @@
 #include "touch.h"
 #include <sys/msg.h>
 #include <string.h>
+#include <stdlib.h>
+#include <time.h>
 
 //C,D,E,F,G,A,B: 계이름
 //C+, C-: 옥타브
@@ -18,7 +20,7 @@
 //[#]: 상시조표
 //[#F]: 라 장조
 //[@BE]: 내림마장조
-
+/*
 const char song_note [] = 
 "[@B]" //바장조
 
@@ -39,9 +41,44 @@ const char song_note [] =
 "D C# D E F E F G A G# A G# A B A G"
 "F G F E D F E D C D E C A B$ C+ A B$ C+ D+ B$ G# A B$ G$"
 "A4"
-;
+;*/
+
+char answer[10] = { 0, };
+char displayedTitle[10] = { 0, };
 
 
+char song[5][56][1000] ={
+        {"classic music title", "E6 D C# D    F8 P G6 F E F   A8 P B6 A G# A"
+"E+ D+ C+# D+    E+ D+   C+# D+      F+4 D+8 F+   E+ D+ C+ D+   E+D+C+D+E+D+C+B$"
+"A4 E6 D C# D F8 P G6 F E F A8 P B6 A G# A"
+"E+ D+ C+# D+   E+ D+ C+# D+    F+4 D+8 F+ E+D+C+D+E+D+C+D+E+D+C+B$"
+"A4"},
+        {"junya wantanabe","classic music title", "E6 D C# D    F8 P G6 F E F   A8 P B6 A G# A"
+"E+ D+ C+# D+    E+ D+   C+# D+      F+4 D+8 F+   E+ D+ C+ D+   E+D+C+D+E+D+C+B$"
+"A4 E6 D C# D F8 P G6 F E F A8 P B6 A G# A"
+"E+ D+ C+# D+   E+ D+ C+# D+    F+4 D+8 F+ E+D+C+D+E+D+C+D+E+D+C+B$"
+"A4"},
+        {"stronger", "classic music title", "E6 D C# D    F8 P G6 F E F   A8 P B6 A G# A"
+"E+ D+ C+# D+    E+ D+   C+# D+      F+4 D+8 F+   E+ D+ C+ D+   E+D+C+D+E+D+C+B$"
+"A4 E6 D C# D F8 P G6 F E F A8 P B6 A G# A"
+"E+ D+ C+# D+   E+ D+ C+# D+    F+4 D+8 F+ E+D+C+D+E+D+C+D+E+D+C+B$"
+"A4"},
+        {"undecided", "classic music title", "E6 D C# D    F8 P G6 F E F   A8 P B6 A G# A"
+"E+ D+ C+# D+    E+ D+   C+# D+      F+4 D+8 F+   E+ D+ C+ D+   E+D+C+D+E+D+C+B$"
+"A4 E6 D C# D F8 P G6 F E F A8 P B6 A G# A"
+"E+ D+ C+# D+   E+ D+ C+# D+    F+4 D+8 F+ E+D+C+D+E+D+C+D+E+D+C+B$"
+"A4"},
+        {"chrismas carol","classic music title", "E6 D C# D    F8 P G6 F E F   A8 P B6 A G# A"
+"E+ D+ C+# D+    E+ D+   C+# D+      F+4 D+8 F+   E+ D+ C+ D+   E+D+C+D+E+D+C+B$"
+"A4 E6 D C# D F8 P G6 F E F A8 P B6 A G# A"
+"E+ D+ C+# D+   E+ D+ C+# D+    F+4 D+8 F+ E+D+C+D+E+D+C+D+E+D+C+B$"
+"A4"},
+};
+int rand1;
+int rand2;
+
+
+	
 enum
 {
 	PARSE_TYPE_INITIAL,
@@ -69,15 +106,12 @@ int main (void)
 {
 	ledLibInit(); 
 	buttonInit();
-	buzzerInit();
-	
-	
-	printf ("JUKEBOX by J.Min\r\n");
+	buzzerInit();	
+	printf ("JUKEBOX by 16조\r\n");
 	printf ("\tHome: Play a song.\r\n");
 	printf ("\tBack: Pause the song.\r\n");
 	printf ("\tStop: Stop the song.\r\n");
 	printf ("\tVol Dn: Quit the Jukebox.\r\n");
-	
 	printf ("\r\nEmbedded system is fun!\r\n");
 	
 	int songPtr = 0;
@@ -91,20 +125,22 @@ int main (void)
 	
 	int permaMajor[8] = {0,0,0,0,0,0,0,0,};	//영구조표 기록
 	int majorMinor = 0;
-	
 	int msgID = msgget (MESSAGE_ID, IPC_CREAT|0666);
-	BUTTON_MSG_T recvdMsg;
-	
+	BUTTON recvdMsg;
 	int ifPlay = 0;
 	while ( 1 )	
 	{
-		if ( msgrcv (msgID, &recvdMsg, sizeof(BUTTON_MSG_T) - sizeof(long int), 0, IPC_NOWAIT) >= 0	)
+			srand((unsigned int)time(NULL)); //seed값으로 현재시간 부여 
+		if ( msgrcv (msgID, &recvdMsg, sizeof(BUTTON)- sizeof(long int), 0, IPC_NOWAIT) >= 0	)
 		{
 			//Button!
 			if (recvdMsg.keyInput == 114) //제일 오른쪽거.
 				break;	//프로그램 종료.
-			else if (recvdMsg.keyInput == 102) //제일 왼쪽거 Play
+			else if (recvdMsg.keyInput == 102){
+				rand1=rand()%4;
+				rand2= and()%4;
 				ifPlay = 1;
+			} //제일 왼쪽거 Play
 			else if (recvdMsg.keyInput == 158) //두번째 거. Pause
 				ifPlay = 0;
 			else if (recvdMsg.keyInput == 217) //세번째 거. Stop
@@ -122,7 +158,7 @@ int main (void)
 			//16분음표 하나 추가.
 			if (waitToNextTick == 0)
 			{
-				if (songPtr == strlen(song_note) )
+				if (songPtr == strlen(song[rand1][1]) )
 				{
 					buzzerStopSong(); //끝.
 				}
@@ -137,13 +173,13 @@ int main (void)
 				}
 				else 
 				{
-					while ( songPtr <= strlen(song_note) ) //while of Parse.
+					while ( songPtr <= strlen(song[rand1][1]) ) //while of Parse.
 					{
 						if (parseType == PARSE_TYPE_INITIAL)	//이것이 뭔가?!
 						{
 							//if ( (song_note[songPtr] == 0) || (song_note[songPtr] == ' ')	songPtr++;	//이건 공백은 해석하지 않기.
 	
-							switch (song_note[songPtr])
+							switch (song[rand1][1][songPtr])
 							{
 								case 'A': newNote = 21;	parseType = PARSE_TYPE_NOTE;	parseStage = PARSE_STAGE_OCT;	nearByScale = 'A'; songPtr++; break;
 								case 'B': newNote = 23;	parseType = PARSE_TYPE_NOTE;	parseStage = PARSE_STAGE_OCT; nearByScale = 'B'; songPtr++; break;
@@ -166,13 +202,13 @@ int main (void)
 							waitToNextTick = prevWaitToNextTick;
 							if (parseStage == PARSE_STAGE_OCT)
 							{
-								if (song_note[songPtr] == '+')		//높은 옥타브...
+								if (song[rand1][1][songPtr] == '+')		//높은 옥타브...
 								{
 									//printf ("HighOct!\r\n");
 									newNote+=12;
 									songPtr++;
 								}
-								else if (song_note[songPtr] == '-')	//낮은 옥타브...
+								else if (song[rand1][1][songPtr] == '-')	//낮은 옥타브...song_no
 								{
 									newNote-=12;
 									songPtr++;
@@ -185,19 +221,19 @@ int main (void)
 								{	//쉼표는 적용하면 안됨.
 									newNote = newNote + permaMajor[nearByScale-'A'] ;	//고정조표 반영
 									//if (permaMajor[nearByScale-'A'] != 0) printf ("nearByScale:%c\r\n",nearByScale);
-									if (song_note[songPtr] == '#') 
+									if (song[rand1][1][songPtr] == '#') 
 									{
 										songPtr++;
 										if (permaMajor[nearByScale-'A']!=1)			//PermaMajor == 1:Sharp이 붙은것.
 											newNote+=1;
 									}
-									else if (song_note[songPtr] == '@') 
+									else if (song[rand1][1][songPtr] == '@') 
 									{
 										songPtr++;
 										if (permaMajor[nearByScale-'A']!=-1)	//PermaMajor == -1:Flat이 붙은것.
 											newNote-=1;
 									}
-									else if (song_note[songPtr] == '$')
+									else if (song[rand1][1][songPtr] == '$')
 									{
 										//......네추랄...
 										songPtr++;
@@ -211,27 +247,27 @@ int main (void)
 							{
 								//printf ("SustainStg...\r\n");
 								
-								if (song_note[songPtr] == '1')
+								if (song[rand1][1][songPtr] == '1')
 								{
 									waitToNextTick = DEFAULT_SUS*32;	//32가 minimum Resolution.
 									songPtr++;
 								}
-								else if (song_note[songPtr] == '2')
+								else if (song[rand1][1][songPtr] == '2')
 								{
 									waitToNextTick = DEFAULT_SUS*16;	//32가 minimum Resolution.
 									songPtr++;
 								}
-								else if (song_note[songPtr] == '4')
+								else if (song[rand1][1][songPtr] == '4')
 								{				
 									waitToNextTick = DEFAULT_SUS*8;	//32가 minimum Resolution.
 									songPtr++;
 								}
-								else if (song_note[songPtr] == '8')
+								else if (song[rand1][1][songPtr] == '8')
 								{
 									waitToNextTick = DEFAULT_SUS*4;
 									songPtr++;
 								}
-								else if (song_note[songPtr] == '6')
+								else if (song[rand1][1][songPtr] == '6')
 								{
 									waitToNextTick = DEFAULT_SUS*2;
 									songPtr++;
@@ -241,7 +277,7 @@ int main (void)
 							}	//Sustain.
 							else if ( parseStage == PARSE_STAGE_POINT )
 							{
-								if (song_note[songPtr] == '.')
+								if (song[rand1][1][songPtr] == '.')
 								{
 									waitToNextTick = waitToNextTick*3/2;	//1.5
 									songPtr++;
@@ -272,13 +308,13 @@ int main (void)
 							//printf("ParseTypeMajor!\r\n");
 							if ( parseStage == PARSE_STAGE_MAJOR_MINOR )
 							{
-								if ( song_note[songPtr] == '#' )
+								if ( song[rand1][1][songPtr] == '#' )
 								{
 									majorMinor = 1;
 									songPtr++;
 									parseStage = PARSE_STAGE_MAJOR_NOTE;
 								}
-								else if (song_note[songPtr] == '@' )
+								else if (song[rand1][1][songPtr] == '@' )
 								{
 									majorMinor = -1;
 									songPtr++;
@@ -292,9 +328,9 @@ int main (void)
 							else if (parseStage == PARSE_STAGE_MAJOR_NOTE)
 							{
 								//printf ("%c!\r\n",song_note[songPtr]);
-								if ( song_note[songPtr] >= 'A' && song_note[songPtr] <= 'G' )
+								if ( song[rand1][1][songPtr] >= 'A' && song[rand1][1][songPtr] <= 'G' )
 								{
-									permaMajor[song_note[songPtr] - 'A'] = majorMinor;
+									permaMajor[song[rand1][1][songPtr] - 'A'] = majorMinor;
 									songPtr++;
 								}
 								else
@@ -305,7 +341,7 @@ int main (void)
 							}
 							else if (parseStage == PARSE_STAGE_MAJOR_CLOSE)
 							{
-								if ( song_note[songPtr] != ']' )
+								if ( song[rand1][1][songPtr] != ']' )
 									//printf ("Major Minor Open/Close err!\r\n");
 								songPtr++;
 								//printf ("%d,%d,%d,%d,%d,%d,%d,%d\r\n",permaMajor[0],permaMajor[1],permaMajor[2],permaMajor[3],permaMajor[4],permaMajor[5],permaMajor[6],permaMajor[7]);
@@ -315,10 +351,57 @@ int main (void)
 					}
 				}	//Play 끝.
 				
-				if ( songPtr > strlen(song_note) )
+				if ( songPtr > strlen(song[rand1][1]) )
 				{
 					printf ("Song is ended, successfully!\r\n");
-					
+				//직접 구현부	
+						
+                         printf("random number is:%d\n", rand1);//변수1 생성
+                         printf("random number is:%d\n", rand2);//변수2 생성
+						printf("song title is %s\n",song[rand1]);
+						printf("the song title of the textlcd is %s \n",song[rand2]);
+						
+
+
+					//
+                    	touchInit();
+						int msgID = msgget( MESSAGE_ID, IPC_CREAT|0666);
+						BUTTON recvMsg;
+							while (1)
+							{
+								msgrcv(msgID, &recvMsg, sizeof (recvMsg)-sizeof (long int), 0, 0);
+								//이떄는 터치가 일어나거나 아니면 터리가 끝날때만 여기에 들어옴!
+								switch (recvMsg.keyInput)
+								{
+									case 999:
+										if (recvMsg.pressed == 1)
+										{
+											if (recvMsg.x <100 && recvMsg.y < 100)
+											{
+												printf ("You touched Lef-Top!\r\n");
+											}
+											else if (recvMsg.x > 500 && recvMsg.y < 100)
+											{
+												printf ("You touched Right-Top!\r\n");
+											}
+											else if (recvMsg.x <100 && recvMsg.y>300)
+											{
+												printf ("You touched Left-Bottom!\r\n");
+											}
+											else if (recvMsg.x > 500 && recvMsg.y > 300)
+											{
+												printf ("You touched Right-Bottom!\r\n");
+										
+											}
+											else
+											{
+												printf ("You touched anywhere... maybe center? :%d %d\r\n",recvMsg.x, recvMsg.y);
+											}
+										}
+									break;
+								}
+							
+							}
 					//Song is ended.
 					ifPlay = 0;
 					songPtr = 0;	//초기화.
@@ -337,4 +420,21 @@ int main (void)
 	ledLibExit();
 	buttonExit();
 	buzzerExit();
+}
+
+
+char *mystrcpy(char *dest, const char *src){
+    char *origin;
+    for (origin = dest; *dest = *src; dest++, src++);//복사한 문자가 참이면 반복
+    return origin;
+}
+int mystrcmp(char *s1, char *s2) {
+    int i = 0;
+    while (s1[i]) {
+        if (s1[i] != s2[i])
+            break;
+        i++;
+    }
+ 
+    return s1[i] - s2[i];
 }
